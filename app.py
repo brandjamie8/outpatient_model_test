@@ -25,9 +25,9 @@ def predict_referrals(last_year_data):
    last_year_referrals = last_year_data['referrals'].sum()
    next_year_referrals = last_year_referrals * (1 + growth_rate / 100)
    st.write(f"Predicted referrals for next year: {next_year_referrals:.0f}")
-   return next_year_referrals
+   return next_year_referrals, growth_rate
 # Function to calculate required appointments to manage expected demand
-def calculate_required_appointments(last_year_data, predicted_referrals):
+def calculate_required_appointments(last_year_data, predicted_referrals, growth_rate):
    first_appointments = last_year_data['first_appointments'].sum()
    follow_up_appointments = last_year_data['follow_up_appointments'].sum()
    discharges = last_year_data['discharges'].sum()
@@ -74,15 +74,15 @@ def main():
        if last_year_data is not None and 'specialty' in last_year_data.columns:
            last_year_data = filter_by_specialty(last_year_data)
            st.write("### Predict Next Year's Referrals")
-           predicted_referrals = predict_referrals(last_year_data)
+           predicted_referrals, growth_rate = predict_referrals(last_year_data)
    elif page == "Plan Next Year's Activity":
        st.header("Plan Required Outpatient Activity")
        last_year_data = upload_data()
        if last_year_data is not None and 'specialty' in last_year_data.columns:
            last_year_data = filter_by_specialty(last_year_data)
            st.write("### Calculate Required Appointments")
-           predicted_referrals = predict_referrals(last_year_data)
-           total_appointments_needed, summary_table = calculate_required_appointments(last_year_data, predicted_referrals)
+           predicted_referrals, growth_rate = predict_referrals(last_year_data)
+           total_appointments_needed, summary_table = calculate_required_appointments(last_year_data, predicted_referrals, growth_rate)
            # Option to download projections as a CSV file
            csv = summary_table.to_csv(index=False).encode('utf-8')
            st.download_button(
